@@ -16,15 +16,14 @@ public class FileService {
     ObjectMapper objectMapper = new ObjectMapper();
 
     public List<User> ReadUsersFromJsonFile(String fileName) throws IOException {
-        File file = new ClassPathResource(fileName).getFile();
+        File file = new File(fileName);
         String usersStr = new String(Files.readAllBytes(file.toPath()));
         return Arrays.asList(objectMapper.readValue(usersStr, User[].class));
     }
 
     public void WriteToJsonFile(List<User> users, String fileName) {
         try {
-            File file = new ClassPathResource(fileName).getFile();
-            objectMapper.writeValue(file, users);
+            objectMapper.writeValue(new File(fileName), users);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -12,13 +12,14 @@ import java.util.Optional;
 
 @Service
 public class UserService {
+    final String file = "data/users.json";
     List<User> Users = new ArrayList<>();
     Integer NextUserId;
     FileService fileService = new FileService();
 
     public UserService() {
         try {
-            Users.addAll(fileService.ReadUsersFromJsonFile("users.json"));
+            Users.addAll(fileService.ReadUsersFromJsonFile(file));
 
             Optional<User> lastUserOpt = Users.stream().max(Comparator.comparingInt(User::getId));
             NextUserId = lastUserOpt.map(User::getId).orElse(-1) + 1;
@@ -36,7 +37,7 @@ public class UserService {
 
         try {
             Users.add(user);
-            fileService.WriteToJsonFile(Users, "users.json");
+            fileService.WriteToJsonFile(Users, file);
         } catch (Exception ex) {
             ex.printStackTrace();
             NextUserId --;
@@ -59,11 +60,18 @@ public class UserService {
     //• Updating an existing user
     public boolean updateUser(User user) {
         Users.remove(user);
+
         return Users.add(user);
     }
 
     //• Deleting an existing user
     public boolean deleteUser(User user) {
-        return Users.remove(user);
+        boolean success = Users.remove(user);
+
+        if (success) {
+            fileService.WriteToJsonFile(Users, file);
+        }
+
+        return success;
     }
 }
